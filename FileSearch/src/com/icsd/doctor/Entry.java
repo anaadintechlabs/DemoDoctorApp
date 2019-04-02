@@ -12,5 +12,6 @@ public class Entry {
 		//Entry Point of application
 		LoginFrame loginFrame = new LoginFrame();
 		// Paras Miglani Entry
+		//Sanchit Khurana Entry
 	}
 }
