@@ -15,12 +15,16 @@ import java.io.File;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.Popup;
+import javax.swing.PopupFactory;
 import javax.swing.filechooser.FileSystemView;
 
 /**
@@ -39,6 +43,9 @@ public class LoginFrame extends JFrame{
 	JPasswordField txtPassword;
 	JButton btnLogin,btnUpload;
 	
+	//three entries for dropdown
+	
+	String caseTypes[]= {"ULTRASOUND","CTSCAN","POLICECASE"};
 	Container c;
 	public LoginFrame() {
 			c=getContentPane();
@@ -134,6 +141,22 @@ public class LoginFrame extends JFrame{
 		if(returnValue==JFileChooser.APPROVE_OPTION) {
 			File selectedFile = jfc.getSelectedFile();
 			System.out.println("selectedFile"+selectedFile);
+			openPopup();
+			
 		}
+	}
+	public void openPopup() {
+		PopupFactory popupfactory = new PopupFactory();
+		Popup sendOptionPopup;
+		
+		JPanel popupPanel = new JPanel();
+		popupPanel.setBackground(Color.red);
+		JComboBox caseTypeComboBox=new JComboBox(caseTypes);    
+		caseTypeComboBox.setBounds(50, 50,90,20);  
+		
+	    popupPanel.add(caseTypeComboBox);
+	    
+	    sendOptionPopup=popupfactory.getPopup(this, popupPanel, 300, 400);
+	    sendOptionPopup.show();
 	}
 }
