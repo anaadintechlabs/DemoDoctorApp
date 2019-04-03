@@ -165,4 +165,7 @@ public class LoginFrame extends JFrame{
 	{
 		System.out.println("fun3 callled ");  
 	}
+	public void myfunsanchit() {
+		
+	}
 }
