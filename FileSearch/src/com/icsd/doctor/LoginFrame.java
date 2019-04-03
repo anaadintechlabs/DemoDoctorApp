@@ -160,4 +160,9 @@ public class LoginFrame extends JFrame{
 	    sendOptionPopup.show();
 	}
 	//Mychanges function
+	
+	public void fun3Sachin()
+	{
+		System.out.println("fun3 callled ");  
+	}
 }
