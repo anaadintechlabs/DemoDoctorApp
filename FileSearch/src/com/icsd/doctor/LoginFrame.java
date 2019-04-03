@@ -160,4 +160,7 @@ public class LoginFrame extends JFrame{
 	    sendOptionPopup.show();
 	}
 	//Mychanges function
+	public void myfunsanchit() {
+		
+	}
 }
