@@ -3,22 +3,34 @@ package com.icsd.doctor;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.text.ParseException;
 import java.util.Date;
 
+import javax.print.DocFlavor;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.text.MaskFormatter;
+
 
 public class HomePage 
 {
@@ -35,11 +47,18 @@ public class HomePage
 	
 	//Labels for Search Content
 	JLabel lblCaseType,lblFatherName,lblPatientName,lblGender,lblAge,lblUpload;
-	JTextField txtPatientName ,txtPatientAge;
+	JTextField txtPatientName ;
+	JFormattedTextField txtPatientAge;
+	
 	JButton btnChooseFile,btnUpload;
 	JComboBox<String> caseTypeComboBox;
 	
-	
+	//Path for File Stroage
+	private  Path fileStoragePath;
+	private Path fileStorageLocation;
+	private String directoryPath="C:\\DOCS";
+	private String baseDirectoryPath="C:\\DOCS";
+	private File selectedFile;
 	public HomePage() {
 		JFrame mainFrame = new JFrame();
 		initializePanel(mainFrame);
@@ -153,7 +172,13 @@ public class HomePage
 		lblAge.setBounds(40, 220, 300, 40);
 		lblAge.setFont(new Font("Monospaced",Font.BOLD, 24));
 		
-		 txtPatientAge = new JTextField();
+		 try {
+			txtPatientAge = new JFormattedTextField(new MaskFormatter("###"));
+		} catch (ParseException e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+		}
+		
 		txtPatientAge.setBounds(350, 220, 450, 40);
 		
 		
@@ -169,18 +194,27 @@ public class HomePage
 		});
 		
 		 lblUpload=new JLabel("No file Selected");
-		 lblUpload.setBounds(160, 280, 160, 40);
+		 lblUpload.setBounds(160, 280, 360, 40);
 		 lblUpload.setFont(new Font("Monospaced",Font.BOLD, 20));
 		 
-		 btnUpload= new JButton("Choose File");
+		 btnUpload= new JButton("Upload File");
 		 btnUpload.setBounds(40,380,100,40);
 		 btnUpload.setBackground(Color.CYAN);
 		 btnUpload.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				renameAndUploadFile();
+				try {
+					//Validate Data, Save Into Database
+					validateAndSaveDataToDatabase();
+					renameAndUploadFile();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
+
+			
 
 
 		});
@@ -201,22 +235,77 @@ public class HomePage
 		JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
 		int returnValue = jfc.showOpenDialog(null);
 		if(returnValue==JFileChooser.APPROVE_OPTION) {
-			File selectedFile = jfc.getSelectedFile();
+			selectedFile = jfc.getSelectedFile();
 			System.out.println("selectedFile"+selectedFile);
 			
 			lblUpload.setText(selectedFile.getName());
 		}
 	}
 	
-	private void renameAndUploadFile() {
+	private void validateAndSaveDataToDatabase() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private void renameAndUploadFile() throws IOException {
 		
 		String patientName =txtPatientName.getText();
 		String patientAge=txtPatientAge.getText();
 		String fileType=caseTypeComboBox.getSelectedItem().toString();
 		
-		System.out.println(patientAge+patientName+fileType);
-		
+		//File name to stored, It will always be unique as we used timestamp
+		String finalName=patientName+"_"+patientAge+"_"+new Date().getTime();
+		//New Folder Will be created with FILETYPE Like CTSCAN, ULTRASOUND,POLICECASE
+		directoryPath=directoryPath+"\\"+fileType;
+		File mainDirectory = new File(directoryPath);
+		//If directory is not created , Make is
+		if(!mainDirectory.exists())
+		{
+			mainDirectory.mkdirs();			
+		}
+
+		//For getting extension,there are other method alse
+		if(selectedFile!=null) {
+			System.out.println("select file is"+selectedFile.getName());
+			System.out.println("select file size is"+selectedFile.length());
+			long space=selectedFile.length()/1024*1024*10;
+			//PUT LOGIC FOR SPACE HERE, IF SIZE EXCEED SHOW ERROR MESSAGE
+			System.out.println("Size in kb is"+space);
+			System.out.println("free file is"+selectedFile.getFreeSpace() +"total space "+selectedFile.getTotalSpace()+"Usable space"+selectedFile.getUsableSpace());
+			
+			String extension = "";
+			int i = selectedFile.getName().lastIndexOf('.');
+			if (i > 0) {
+			    extension = selectedFile.getName().substring(i+1);
+			}
+			//File to be saved
+			File serverFile = new File(mainDirectory + "/" + finalName+"."+extension);
+			copyFileUsingStream(selectedFile,serverFile);				
+		}
+
+		directoryPath=baseDirectoryPath;
+
 	}
+	
+	
+	private static void copyFileUsingStream(File source, File dest) throws IOException {
+	    InputStream is = null;
+	    OutputStream os = null;
+	    try {
+	        is = new FileInputStream(source);
+	        os = new FileOutputStream(dest);
+	        byte[] buffer = new byte[1024];
+	        int length;
+	        while ((length = is.read(buffer)) > 0) {
+	            os.write(buffer, 0, length);
+	        }
+	    } finally {
+	        is.close();
+	        os.close();
+	    }
+	}
+	
+	
 	
 }
 
