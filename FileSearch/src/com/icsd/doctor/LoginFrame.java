@@ -117,7 +117,10 @@ public class LoginFrame extends JFrame{
 		this.setTitle("demo");
 		this.setLayout(null);
 		//for full screen frame
-		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+//		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		
+		this.setSize(new Dimension(1200,600));
+		this.setResizable(false);
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);

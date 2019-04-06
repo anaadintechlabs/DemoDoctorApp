@@ -1,24 +1,27 @@
 package com.icsd.doctor;
-
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Date;
 
 import javax.print.DocFlavor;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -27,6 +30,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.MaskFormatter;
@@ -44,21 +49,19 @@ public class HomePage
 	String[] menuButtonStrings= {"DashBoard","Search","Upload","Logout"};
 	JPanel menuPanel,contentPanel;
 	String caseTypes[]= {"ULTRASOUND","CTSCAN","POLICECASE"};
+	Connection connection =null;
 	
 	//Labels for Search Content
-	JLabel lblCaseType,lblFatherName,lblPatientName,lblGender,lblAge,lblUpload;
-	JTextField txtPatientName ;
-	JFormattedTextField txtPatientAge;
+	JLabel lblCaseType,lblFatherName,lblPatientName,lblGender,lblAge,lblUpload,lblFnm,lblGen;
+	JTextField txtPatientName ,txtPatientAge,txtFnm;
+	JRadioButton btnMale,btnFem;
+	ButtonGroup btngrp;
 	
-	JButton btnChooseFile,btnUpload;
+	File selectedFile;
+	String directoryPath="C:\\DOCS";
+	String baseDirectoryPath="C:\\DOCS";
+	JButton btnChooseFile,btnUpload,btnSearch;
 	JComboBox<String> caseTypeComboBox;
-	
-	//Path for File Stroage
-	private  Path fileStoragePath;
-	private Path fileStorageLocation;
-	private String directoryPath="C:\\DOCS";
-	private String baseDirectoryPath="C:\\DOCS";
-	private File selectedFile;
 	public HomePage() {
 		JFrame mainFrame = new JFrame();
 		initializePanel(mainFrame);
@@ -124,7 +127,7 @@ public class HomePage
 			setSearchContentInContentPanel();
 			break;
 		case "Upload":
-			setUploadContentInContentPanel();
+			setUploadContentInContentPanel("Upload");
 			break;
 		case "Logout":
 			break;
@@ -142,11 +145,12 @@ public class HomePage
 
 	private void setSearchContentInContentPanel() {
 		contentPanel.removeAll();
+		setUploadContentInContentPanel("Search");
 		contentPanel.setBackground(Color.blue);
 	}
 
 
-	private void setUploadContentInContentPanel() {
+	private void setUploadContentInContentPanel(String From) {
 		contentPanel.removeAll();
 		contentPanel.setBackground(Color.gray);
 		
@@ -171,19 +175,38 @@ public class HomePage
 		lblAge=new JLabel("Paitent's Age");
 		lblAge.setBounds(40, 220, 300, 40);
 		lblAge.setFont(new Font("Monospaced",Font.BOLD, 24));
-		
+	
 		 try {
-			txtPatientAge = new JFormattedTextField(new MaskFormatter("###"));
+			txtPatientAge = new JFormattedTextField(new MaskFormatter("##"));
 		} catch (ParseException e2) {
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		
 		txtPatientAge.setBounds(350, 220, 450, 40);
 		
+		lblFnm = new JLabel("Father's Name");
+		lblFnm.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblFnm.setBounds(40, 260, 300, 40);
+		
+		txtFnm = new JTextField();
+		txtFnm.setBounds(350, 260, 450, 40);
+		
+		lblGen = new JLabel("Gender");
+		lblGen.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblGen.setBounds(40, 320, 300, 40);
+		
+		btnMale = new JRadioButton("Male");
+		btnMale.setBounds(300, 320, 100, 30);
+		
+		btnFem = new JRadioButton("Female");
+		btnFem.setBounds(450, 320, 100, 30);
+		
+		btngrp = new ButtonGroup();
+		btngrp.add(btnMale);
+		btngrp.add(btnFem);
 		
 		 btnChooseFile= new JButton("Choose File");
-		 btnChooseFile.setBounds(40,280,100,40);
+		 btnChooseFile.setBounds(40,380,100,40);
 		 btnChooseFile.setBackground(Color.CYAN);
 		 btnChooseFile.addActionListener(new ActionListener() {
 			
@@ -194,11 +217,17 @@ public class HomePage
 		});
 		
 		 lblUpload=new JLabel("No file Selected");
-		 lblUpload.setBounds(160, 280, 360, 40);
+		 lblUpload.setBounds(160, 380, 160, 40);
 		 lblUpload.setFont(new Font("Monospaced",Font.BOLD, 20));
 		 
-		 btnUpload= new JButton("Upload File");
-		 btnUpload.setBounds(40,380,100,40);
+		
+		 btnSearch = new JButton("Search");
+		 btnSearch.setBounds(40,420,100,40);	
+		 btnSearch.setBackground(Color.CYAN);
+		 
+		 btnUpload= new JButton("Upload");
+		 btnUpload.setBounds(40,420,100,40);
+
 		 btnUpload.setBackground(Color.CYAN);
 		 btnUpload.addActionListener(new ActionListener() {
 			
@@ -213,22 +242,37 @@ public class HomePage
 					e1.printStackTrace();
 				}
 			}
-
-			
-
-
 		});
+		 
+		 btnSearch.addActionListener(new ActionListener() {
+				
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					searchFiles();
+				}
+			});
 		
 		contentPanel.add(lblCaseType);
+		contentPanel.add(lblFnm);
+		
 		contentPanel.add(caseTypeComboBox);
 		contentPanel.add(lblPatientName);
-		contentPanel.add(txtPatientAge);
-		contentPanel.add(lblAge);
+		
+		contentPanel.add(txtFnm);
 		contentPanel.add(txtPatientName);
 		contentPanel.add(btnChooseFile);
 		contentPanel.add(lblUpload);
-		contentPanel.add(btnUpload);
-		
+		if("Upload".equalsIgnoreCase(From)){
+			contentPanel.add(btnUpload);
+			contentPanel.add(lblGen);
+			contentPanel.add(btnMale);
+			contentPanel.add(btnFem);
+			contentPanel.add(lblAge);
+			contentPanel.add(txtPatientAge);
+		}
+		if("Search".equalsIgnoreCase(From)){
+		  contentPanel.add(btnSearch);
+		}
 	}
 	
 	public void callFileChooser() {
@@ -253,11 +297,13 @@ public class HomePage
 		String patientAge=txtPatientAge.getText();
 		String fileType=caseTypeComboBox.getSelectedItem().toString();
 		
+		
 		//File name to stored, It will always be unique as we used timestamp
 		String finalName=patientName+"_"+patientAge+"_"+new Date().getTime();
 		//New Folder Will be created with FILETYPE Like CTSCAN, ULTRASOUND,POLICECASE
 		directoryPath=directoryPath+"\\"+fileType;
 		File mainDirectory = new File(directoryPath);
+		File serverFile = null;
 		//If directory is not created , Make is
 		if(!mainDirectory.exists())
 		{
@@ -279,12 +325,94 @@ public class HomePage
 			    extension = selectedFile.getName().substring(i+1);
 			}
 			//File to be saved
-			File serverFile = new File(mainDirectory + "/" + finalName+"."+extension);
+			 serverFile = new File(mainDirectory + "/" + finalName+"."+extension);
 			copyFileUsingStream(selectedFile,serverFile);				
 		}
 
 		directoryPath=baseDirectoryPath;
 
+		String fatherName = txtFnm.getText().toString();
+		String gen = "";
+		if(btnMale.isSelected()){
+			gen = "M";
+		}else if(btnFem.isSelected()){
+			gen = "F";
+		}
+		  
+		  try {
+			 connection = getdbConn();
+			 System.out.println("connection success");
+			 String selectSql = "Insert into PatientDetails values (?,?,?,?,?,?,?,?,?)";
+			 
+			 if(connection!=null){
+			 PreparedStatement statement = connection.prepareStatement(selectSql);
+			 statement.setInt(1, 1);
+			 statement.setString(2, patientName);
+			 statement.setInt(3, 1);
+			 statement.setString(4, fatherName);
+			 statement.setString(5, gen);
+			 statement.setString(6, fileType);
+			 statement.setString(7, selectedFile.toString());
+			 statement.setDate(8, new java.sql.Date(new Date().getTime()));
+			 statement.setString(9, finalName);
+			 
+			 
+	            statement.executeQuery();
+	            System.out.println("data inserted successfully");
+            	JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
+	            // Print results from select statement
+	            
+			 }
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(patientAge+patientName+fileType);
+		
+	}
+
+	private void  searchFiles(){
+		String patientName =txtPatientName.getText();
+		String patientAge=txtPatientAge.getText();
+		String fileType=caseTypeComboBox.getSelectedItem().toString();
+		String fatherName = txtFnm.getText().toString();
+		 String selectSql = "select * from PatientDetails where PatientName like ? and FileType like ? and FatherName like ?";
+		  try {
+				 connection = getdbConn();
+				 System.out.println("connection success");
+				 	 
+				 if(connection!=null){
+				 PreparedStatement statement = connection.prepareStatement(selectSql);
+				 
+				 statement.setString(1, "%"+patientName+"%");
+//				 statement.setInt(2, Integer.parseInt(patientAge));
+				 statement.setString(2, "%"+fileType+"%");
+				 statement.setString(3, "%"+fatherName+"%");
+				 
+				 
+		            statement.executeQuery();
+		            System.out.println("data inserted successfully");
+	            	JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
+		            // Print results from select statement
+		            
+				 }
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+
+	private Connection getdbConn() {
+		String connectionUrl =
+                "jdbc:sqlserver://localhost:1433;user=sa;password=enter;database=Test";
+		Connection conn = null;
+		try {
+			 conn = DriverManager.getConnection(connectionUrl);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return conn;
 	}
 	
 	
