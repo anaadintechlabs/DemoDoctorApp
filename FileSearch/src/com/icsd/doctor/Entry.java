@@ -10,10 +10,10 @@ public class Entry {
 	public static void main(String[] args) {
 		
 		//Entry Point of application
-	//	LoginFrame loginFrame = new LoginFrame();
+		LoginFrame loginFrame = new LoginFrame();
 		// Paras Miglani Entry
 		//Sanchit Khurana Entry
 		//ok
-		HomePage homePage = new HomePage();
+		//HomePage homePage = new HomePage();
 	}
 }

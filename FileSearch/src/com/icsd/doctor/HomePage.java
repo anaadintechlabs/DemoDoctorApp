@@ -20,6 +20,7 @@ import java.text.ParseException;
 import java.util.Date;
 
 import javax.print.DocFlavor;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
@@ -57,13 +58,16 @@ public class HomePage
 	JRadioButton btnMale,btnFem;
 	ButtonGroup btngrp;
 	
+	//Labels for Dashboards
+	JLabel lblUltraSound,lblCTScan,lblPoliceCase,lblFemalePatients,lblMalePatients;
 	File selectedFile;
 	String directoryPath="C:\\DOCS";
 	String baseDirectoryPath="C:\\DOCS";
 	JButton btnChooseFile,btnUpload,btnSearch;
 	JComboBox<String> caseTypeComboBox;
+	JFrame mainFrame;
 	public HomePage() {
-		JFrame mainFrame = new JFrame();
+		mainFrame = new JFrame();
 		initializePanel(mainFrame);
 	}
 
@@ -74,20 +78,34 @@ public class HomePage
 		//For setting menu and frame horizontally
 		mainFrame.setLayout(new BoxLayout(mainFrame.getContentPane(), BoxLayout.X_AXIS));
 		 menuPanel = new JPanel();
-		menuPanel.setLayout(new BoxLayout(menuPanel,BoxLayout.Y_AXIS));
+		//menuPanel.setLayout(new BoxLayout(menuPanel,BoxLayout.Y_AXIS));
+		 menuPanel.setLayout(null);
+		 mainFrame.setSize(new Dimension(200,600));
 		 contentPanel = new JPanel();
 		
 		menuButtons= new JButton[menuButtonStrings.length];
 		//Generating Menu Button
 		int i=0;
+		int xAxis;
+		int yAxis=50;
 		for( i =0;i<menuButtons.length;i++) {
 			menuButtons[i]=new JButton(menuButtonStrings[i]);
-			menuButtons[i].setPreferredSize(new Dimension(200, 70));
+//			menuButtons[i].setPreferredSize(new Dimension(200, 70));
+			menuButtons[i].setForeground(Color.cyan);
+			menuButtons[i].setBackground(Color.black);
+
+			menuButtons[i].setBounds(40, yAxis, 200, 50);
+			yAxis+=50;
 			menuButtons[i].addActionListener(new ActionListener() {
 				
 				@Override
 				public void actionPerformed(ActionEvent e) {
-				manageButtonClicked(e.getActionCommand());
+				try {
+					manageButtonClicked(e.getActionCommand());
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				}
 
 				
@@ -105,18 +123,21 @@ public class HomePage
 		mainFrame.add(menuPanel);
 		mainFrame.add(contentPanel);
 		
-
-		mainFrame.setVisible(true);
+		
+		mainFrame.setSize(new Dimension(1200,600));
+		mainFrame.setResizable(false);
+		
 		mainFrame.setLocationRelativeTo(null);
-		mainFrame.setMinimumSize(new Dimension(800,800));
-		mainFrame.setSize(800, 800);
+		mainFrame.setVisible(true);
+
+
 	}
 	
 	
 
 
 	//Method to manage to click events
-	private void manageButtonClicked(String btnName) {
+	private void manageButtonClicked(String btnName) throws SQLException {
 		System.out.println("Button CLicked is"+btnName);
 		switch(btnName) {
 		
@@ -130,6 +151,7 @@ public class HomePage
 			setUploadContentInContentPanel("Upload");
 			break;
 		case "Logout":
+			logoutUser();
 			break;
 		
 		}
@@ -137,8 +159,77 @@ public class HomePage
 	}
 
 
-	private void setDashboardContentInContentPanel() {
-		// TODO Auto-generated method stub
+	private void logoutUser() {
+		 mainFrame.dispose();
+		 new LoginFrame();
+		 JOptionPane.showMessageDialog(null, "User Logged out!", "Success", 0);			
+		 
+		
+	}
+
+	//On Dashboard We will display
+	//1 Todays Patient
+	//2 Total Ultrasount cases
+	//3 Total CTscan cases
+	//4 Total Police Case
+	//5 Total Female Gender
+	//6 Total Male Gender
+
+	private void setDashboardContentInContentPanel() throws SQLException {
+		contentPanel.removeAll();
+		//getDataForDashboard();
+		
+		lblUltraSound=new JLabel("Total Ultrasound Cases");
+		lblUltraSound.setBounds(40, 100, 300, 40);
+		lblUltraSound.setFont(new Font("Monospaced",Font.BOLD, 24));
+		
+		
+		lblCTScan=new JLabel("Total CT Scan Cases");
+		lblCTScan.setBounds(40, 150, 300, 40);
+		lblCTScan.setFont(new Font("Monospaced",Font.BOLD, 24));
+		
+		lblPoliceCase=new JLabel("Total Police Cases");
+		lblPoliceCase.setBounds(40, 200, 300, 40);
+		lblPoliceCase.setFont(new Font("Monospaced",Font.BOLD, 24));
+		
+		
+		lblFemalePatients=new JLabel("Total Female Cases");
+		lblFemalePatients.setBounds(40, 250, 300, 40);
+		lblFemalePatients.setFont(new Font("Monospaced",Font.BOLD, 24));
+		
+		
+		lblMalePatients=new JLabel("Total Male Cases");
+		lblMalePatients.setBounds(40, 300, 300, 40);
+		lblMalePatients.setFont(new Font("Monospaced",Font.BOLD, 24));
+		
+		
+		contentPanel.add(lblMalePatients);
+		contentPanel.add(lblFemalePatients);
+		contentPanel.add(lblPoliceCase);
+		contentPanel.add(lblCTScan);
+		contentPanel.add(lblUltraSound);
+		
+		
+	}
+
+
+	private void getDataForDashboard() throws SQLException {
+		 try {
+			 connection = getdbConn();
+			 String selectSql="";
+			 if(connection!=null){
+				 PreparedStatement statement = connection.prepareStatement(selectSql);
+				 ResultSet rs = statement.executeQuery();
+				 if(rs.next()){
+					 
+				 }
+			 }
+			 
+		 }
+		 catch(Exception e){
+			 System.out.println("x occured");
+			 connection.close();
+		 	}
 		
 	}
 
@@ -296,7 +387,7 @@ public class HomePage
 		String patientName =txtPatientName.getText();
 		String patientAge=txtPatientAge.getText();
 		String fileType=caseTypeComboBox.getSelectedItem().toString();
-		
+		System.out.println("Patient Age"+patientAge);
 		
 		//File name to stored, It will always be unique as we used timestamp
 		String finalName=patientName+"_"+patientAge+"_"+new Date().getTime();
@@ -348,7 +439,7 @@ public class HomePage
 			 PreparedStatement statement = connection.prepareStatement(selectSql);
 			 statement.setInt(1, 1);
 			 statement.setString(2, patientName);
-			 statement.setInt(3, 1);
+			 statement.setInt(3, Integer.parseInt(patientAge));
 			 statement.setString(4, fatherName);
 			 statement.setString(5, gen);
 			 statement.setString(6, fileType);
@@ -357,10 +448,18 @@ public class HomePage
 			 statement.setString(9, finalName);
 			 
 			 
-	            statement.executeQuery();
-	            System.out.println("data inserted successfully");
-            	JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
+	           // if(statement.execute()){
+	            	 System.out.println("data inserted successfully");
+	             	JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
+	             	setDashboardContentInContentPanel();
+//	            }
+//	            else
+//	            {
+//	            	JOptionPane.showMessageDialog(null, "Erro Uploading File");
+//	            }
+	           
 	            // Print results from select statement
+            	//Now go to dashboard
 	            
 			 }
 		} catch (Exception e) {

@@ -11,8 +11,14 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -42,6 +48,8 @@ public class LoginFrame extends JFrame{
 	JTextField txtUsername;
 	JPasswordField txtPassword;
 	JButton btnLogin,btnUpload;
+	JPanel pnl1,pnl2,mainPanel;
+	Connection connection =null;
 	
 	//three entries for dropdown
 	
@@ -50,35 +58,37 @@ public class LoginFrame extends JFrame{
 	public LoginFrame() {
 			c=getContentPane();
 			this.pack();
+			mainPanel = new JPanel(new BoxLayout(c, BoxLayout.X_AXIS));
 			System.out.println("height is"+c.getHeight()+"widht is"+c.getWidth());
 		
 		 lblWelcome = new JLabel("Welcome");
-		lblWelcome.setBounds(180, 300, 300, 60);
+		lblWelcome.setBounds(80, 60, 300, 60);
 		lblWelcome.setFont(new Font("Monospaced",Font.BOLD, 48));
 		
 		 lblMessage = new JLabel("Login to access your account");
-		lblMessage.setBounds(150, 380, 450,60);
-		lblMessage.setFont(new Font("Monospaced",Font.ITALIC,24));
+		lblMessage.setBounds(30, 140, 450,60);
+		lblMessage.setFont(new Font("Monospaced",Font.ITALIC,20));
 		
 		 lblUsername=new JLabel("Username");
-		lblUsername.setBounds(150, 460, 300, 40);
+		lblUsername.setBounds(30, 220, 300, 40);
 		lblUsername.setFont(new Font("Monospaced",Font.BOLD, 24));
 		
 		
 		 txtUsername = new JTextField();
-		txtUsername.setBounds(150, 520, 450, 40);
+		txtUsername.setBounds(30, 280, 350, 40);
 		
 		 lblPassword=new JLabel("Password");
-		lblPassword.setBounds(150, 560, 300, 40);
+		lblPassword.setBounds(30, 340, 300, 40);
 		lblPassword.setFont(new Font("Monospaced",Font.BOLD, 24));
 		
 		 txtPassword = new JPasswordField();
-		txtPassword.setBounds(150, 620, 450, 40);
+		txtPassword.setBounds(30, 400, 350, 40);
 		
 		
 		 btnLogin = new JButton("Login");
-		btnLogin.setBounds(150,680,100,40);
+		btnLogin.setBounds(30,460,100,40);
 		btnLogin.setBackground(Color.CYAN);
+	
 		btnLogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -100,7 +110,7 @@ public class LoginFrame extends JFrame{
 		});
 			
 		lblLogo = new JLabel(new ImageIcon("Images/demo.jpg"));
-		lblLogo.setBounds(650, 0, 1300,1050);
+		lblLogo.setBounds(400, 0, 800,800);
 		
 		c.add(lblWelcome);
 		c.add(lblMessage);
@@ -131,11 +141,38 @@ public class LoginFrame extends JFrame{
 	private void checkCredentials() {
 		
 		String username=txtUsername.getText();
-		String password=txtPassword.getPassword().toString();
+		String password=txtPassword.getText();
 		System.out.println("Username is "+username);
 		System.out.println("Password is "+password);
-		JOptionPane.showMessageDialog(null, "User name is "+username+"Password is"+password, "Demo", 0);
-			
+		
+		String selectSql = "select * from users where unm=? and pwd=?";
+		  try {
+			  connection = getdbConn();
+			  if(connection!=null){
+					 PreparedStatement statement = connection.prepareStatement(selectSql);
+					 statement.setString(1, username);
+					 statement.setString(2, password);
+					 ResultSet rs=statement.executeQuery();
+					 System.out.println("Resule set is "+rs);
+					 if(rs.next()){
+						 this.dispose();
+						 new HomePage();
+						 JOptionPane.showMessageDialog(null, "Login Successfull", "Success", 0);			
+						 
+					 }
+					 else
+					 {
+						 JOptionPane.showMessageDialog(null, "Invalid Credentials", "Oops!", 0);
+					 }
+					
+			  }
+			  
+		  }
+		  catch(Exception e){
+			  System.out.println("Exception occured"+e);
+
+		  }
+		
 	}
 	
 	public void callFileChooser() {
@@ -170,5 +207,19 @@ public class LoginFrame extends JFrame{
 	}
 	public void myfunsanchit() {
 		
+	}
+	
+	
+	private Connection getdbConn() {
+		String connectionUrl =
+                "jdbc:sqlserver://localhost:1433;user=sa;password=enter;database=Test";
+		Connection conn = null;
+		try {
+			 conn = DriverManager.getConnection(connectionUrl);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return conn;
 	}
 }
