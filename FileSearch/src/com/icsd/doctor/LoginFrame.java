@@ -44,12 +44,13 @@ public class LoginFrame extends JFrame{
 	private static final long serialVersionUID = 1L;
 
 	//Login frame labels and fields 
-	JLabel lblWelcome,lblMessage,lblUsername,lblPassword,lblLogo;
+	JLabel lblWelcome,lblMessage,lblUsername,lblPassword,lblLogo,lblPasswordIcon,lblUserNameIcon;
 	JTextField txtUsername;
 	JPasswordField txtPassword;
 	JButton btnLogin,btnUpload;
 	JPanel pnl1,pnl2,mainPanel;
 	Connection connection =null;
+
 	
 	//three entries for dropdown
 	
@@ -61,38 +62,47 @@ public class LoginFrame extends JFrame{
 			mainPanel = new JPanel(new BoxLayout(c, BoxLayout.X_AXIS));
 			System.out.println("height is"+c.getHeight()+"widht is"+c.getWidth());
 		
-		 lblWelcome = new JLabel("Welcome");
-		lblWelcome.setBounds(80, 60, 300, 60);
-		lblWelcome.setFont(new Font("Monospaced",Font.BOLD, 48));
+		 lblWelcome = new JLabel("Login");
+		lblWelcome.setBounds(20, 60, 80, 60);
+		lblWelcome.setFont(new Font("Monospaced",Font.BOLD, 24));
 		
-		 lblMessage = new JLabel("Login to access your account");
-		lblMessage.setBounds(30, 140, 450,60);
-		lblMessage.setFont(new Font("Monospaced",Font.ITALIC,20));
+//		
+//		 lblMessage = new JLabel("Login to access your account");
+//		lblMessage.setBounds(30, 140, 450,60);
+//		lblMessage.setFont(new Font("Monospaced",Font.ITALIC,20));
 		
-		 lblUsername=new JLabel("Username");
-		lblUsername.setBounds(30, 220, 300, 40);
-		lblUsername.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblUsername=new JLabel("Username");
+		lblUsername.setBounds(20, 100, 80, 40);
+		lblUsername.setFont(new Font("Monospaced",Font.BOLD, 14));
+		lblUsername.setForeground(Color.GRAY);
 		
+		lblUserNameIcon = new JLabel(new ImageIcon("Images/user.png"));
+		lblUserNameIcon.setBounds(80, 100, 40,40);
 		
 		 txtUsername = new JTextField();
-		txtUsername.setBounds(30, 280, 350, 40);
+		txtUsername.setBounds(20, 150, 350, 40);
 		
 		 lblPassword=new JLabel("Password");
-		lblPassword.setBounds(30, 340, 300, 40);
-		lblPassword.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblPassword.setBounds(20, 190, 300, 40);
+		lblPassword.setFont(new Font("Monospaced",Font.BOLD, 14));
+		lblPassword.setForeground(Color.GRAY);
+		
+		lblPasswordIcon = new JLabel(new ImageIcon("Images/key.png"));
+		lblPasswordIcon.setBounds(80, 190, 40,40);
 		
 		 txtPassword = new JPasswordField();
-		txtPassword.setBounds(30, 400, 350, 40);
+		txtPassword.setBounds(20, 240, 350, 40);
 		
 		
 		 btnLogin = new JButton("Login");
-		btnLogin.setBounds(30,460,100,40);
+		btnLogin.setBounds(20,300,100,40);
 		btnLogin.setBackground(Color.CYAN);
 	
 		btnLogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				checkCredentials();
+				new HomePage();
+			//	checkCredentials();
 			}
 
 		
@@ -113,7 +123,7 @@ public class LoginFrame extends JFrame{
 		lblLogo.setBounds(400, 0, 800,800);
 		
 		c.add(lblWelcome);
-		c.add(lblMessage);
+		//c.add(lblMessage);
 		c.add(lblUsername);
 		c.add(txtUsername);
 		c.add(lblPassword);
@@ -121,10 +131,11 @@ public class LoginFrame extends JFrame{
 		c.add(btnLogin);
 		c.add(lblLogo);
 		c.add(btnUpload);
-		
+		c.add(lblPasswordIcon);
+		c.add(lblUserNameIcon);
 		c.setBackground(Color.white);
 		
-		this.setTitle("demo");
+		this.setTitle("Hospital");
 		this.setLayout(null);
 		//for full screen frame
 //		this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -212,7 +223,7 @@ public class LoginFrame extends JFrame{
 	
 	private Connection getdbConn() {
 		String connectionUrl =
-                "jdbc:sqlserver://localhost:1433;user=sa;password=enter;database=Test";
+                "jdbc:sqlserver://localhost:1433;user=sa;password=Paras@10;database=Test";
 		Connection conn = null;
 		try {
 			 conn = DriverManager.getConnection(connectionUrl);
