@@ -1,6 +1,7 @@
 package com.icsd.doctor;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -24,6 +25,7 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFormattedTextField;
@@ -33,8 +35,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.text.MaskFormatter;
 
 
@@ -119,6 +125,8 @@ public class HomePage
 		contentPanel.setLayout(null);
 		//Adding menuPanel and Content Panel to basePanel
 		menuPanel.setVisible(true);
+		menuPanel.setPreferredSize(new Dimension(100,100));
+		contentPanel.setPreferredSize(new Dimension(700,1000));
 		contentPanel.setVisible(true);
 		mainFrame.add(menuPanel);
 		mainFrame.add(contentPanel);
@@ -351,8 +359,7 @@ public class HomePage
 		
 		contentPanel.add(txtFnm);
 		contentPanel.add(txtPatientName);
-		contentPanel.add(btnChooseFile);
-		contentPanel.add(lblUpload);
+	
 		if("Upload".equalsIgnoreCase(From)){
 			contentPanel.add(btnUpload);
 			contentPanel.add(lblGen);
@@ -360,6 +367,8 @@ public class HomePage
 			contentPanel.add(btnFem);
 			contentPanel.add(lblAge);
 			contentPanel.add(txtPatientAge);
+			contentPanel.add(btnChooseFile);
+			contentPanel.add(lblUpload);
 		}
 		if("Search".equalsIgnoreCase(From)){
 		  contentPanel.add(btnSearch);
@@ -446,7 +455,7 @@ public class HomePage
 			 statement.setString(7, selectedFile.toString());
 			 statement.setDate(8, new java.sql.Date(new Date().getTime()));
 			 statement.setString(9, finalName);
-			 
+			 statement.executeQuery();
 			 
 	           // if(statement.execute()){
 	            	 System.out.println("data inserted successfully");
@@ -475,6 +484,7 @@ public class HomePage
 		String patientAge=txtPatientAge.getText();
 		String fileType=caseTypeComboBox.getSelectedItem().toString();
 		String fatherName = txtFnm.getText().toString();
+		System.out.println("patientName"+patientName+"fileType"+fileType+"fatherName"+fatherName);
 		 String selectSql = "select * from PatientDetails where PatientName like ? and FileType like ? and FatherName like ?";
 		  try {
 				 connection = getdbConn();
@@ -488,10 +498,46 @@ public class HomePage
 				 statement.setString(2, "%"+fileType+"%");
 				 statement.setString(3, "%"+fatherName+"%");
 				 
-				 
-		            statement.executeQuery();
-		            System.out.println("data inserted successfully");
-	            	JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
+				 JTable tbl = null ;
+		            ResultSet rs=statement.executeQuery();
+		            //System.out.println(rs.next()+"rss");
+		            System.out.println(rs.getFetchSize()+"rss");
+//		            if(rs.next()){
+		            	System.out.println("Paras");
+		            	tbl = new JTable();
+		            	 DefaultTableModel dtm = new DefaultTableModel(0, 0);
+		            	 String header[] =  { "Patient Name", "Father Name",
+		            	            "File Type", "File Name","Button"};
+		            	 dtm.setColumnIdentifiers(header);
+		            	 JButton btn;
+		            	 while(rs.next()){
+		            		 System.out.println("testppp");
+		            		 dtm.addRow(new Object[]{
+		            			rs.getString("PatientName"),
+		            			rs.getString("FatherName"),
+		            			rs.getString("FileType"),
+		            			rs.getString("FileName"),
+		            			rs.getString("FilePath"),
+		            		 });
+		            	//	 tbl.getColumn("Action").setCellRenderer(new ButtonRenderer());
+		            //		 System.out.println(rs.getString("PatientName"));
+		            	 }
+		            	// tbl.setBounds(40,320,600,400);
+		            	 tbl.setModel(dtm);
+		            	 tbl.getColumn("Button").setCellRenderer(new ButtonRenderer());
+		            	 tbl.addMouseListener(new JTableButtonMouseListener(tbl)); 
+		            	 tbl.getColumn("Button").setCellEditor(new ButtonEditor(new JCheckBox()));
+		            	   TableColumn column = tbl.getColumnModel().getColumn(3);
+		            	   column.setPreferredWidth(150);
+                           tbl.setEnabled(false);
+		            	 JScrollPane scrollPane = new JScrollPane(tbl);
+		            	 scrollPane.setBounds(200, 400, 600, 200);
+		            	 contentPanel.add(scrollPane);
+		          //  }
+		            System.out.println("Search successfully"+rs);
+		            
+		            System.out.println("Table added");
+	            	//JOptionPane.showMessageDialog(null, "File Uploaded Successfully");
 		            // Print results from select statement
 		            
 				 }
