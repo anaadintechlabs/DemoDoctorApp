@@ -60,7 +60,7 @@ public class HomePage
 	
 	//Labels for Search Content
 	JLabel lblCaseType,lblFatherName,lblPatientName,lblGender,lblAge,lblUpload,lblFnm,lblGen;
-	JTextField txtPatientName ,txtPatientAge,txtFnm;
+	JTextField txtPatientName ,txtPatientAge,txtFnm,txtFileName;
 	JRadioButton btnMale,btnFem;
 	ButtonGroup btngrp;
 	
@@ -93,14 +93,14 @@ public class HomePage
 		//Generating Menu Button
 		int i=0;
 		int xAxis;
-		int yAxis=50;
+		int yAxis=0;
 		for( i =0;i<menuButtons.length;i++) {
 			menuButtons[i]=new JButton(menuButtonStrings[i]);
 //			menuButtons[i].setPreferredSize(new Dimension(200, 70));
-			menuButtons[i].setForeground(Color.cyan);
+			menuButtons[i].setForeground(Color.gray);
 			menuButtons[i].setBackground(Color.black);
 
-			menuButtons[i].setBounds(40, yAxis, 200, 50);
+			menuButtons[i].setBounds(0, yAxis, 300, 50);
 			yAxis+=50;
 			menuButtons[i].addActionListener(new ActionListener() {
 				
@@ -121,7 +121,7 @@ public class HomePage
 		
 		//Method for setting content
 		//setContentPanel("Home");
-		contentPanel.setBackground(Color.red);
+		contentPanel.setBackground(Color.black);
 		contentPanel.setLayout(null);
 		//Adding menuPanel and Content Panel to basePanel
 		menuPanel.setVisible(true);
@@ -254,8 +254,8 @@ public class HomePage
 		contentPanel.setBackground(Color.gray);
 		
 		lblCaseType=new JLabel("File Type");
-		lblCaseType.setBounds(40, 100, 300, 40);
-		lblCaseType.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblCaseType.setBounds(40, 60, 300, 40);
+		lblCaseType.setFont(new Font("Monospaced",Font.BOLD, 20));
 		
 		
 		caseTypeComboBox =new JComboBox<String>(caseTypes);  
@@ -264,16 +264,16 @@ public class HomePage
 		
 		
 		lblPatientName=new JLabel("Patient's Name");
-		lblPatientName.setBounds(40, 160, 300, 40);
-		lblPatientName.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblPatientName.setBounds(40, 100, 300, 40);
+		lblPatientName.setFont(new Font("Monospaced",Font.BOLD, 20));
 		
 		
 		txtPatientName = new JTextField();
-		txtPatientName.setBounds(350, 160, 300, 40);
+		txtPatientName.setBounds(350, 100, 300, 40);
 		
 		lblAge=new JLabel("Paitent's Age");
-		lblAge.setBounds(40, 220, 300, 40);
-		lblAge.setFont(new Font("Monospaced",Font.BOLD, 24));
+		lblAge.setBounds(40, 150, 300, 40);
+		lblAge.setFont(new Font("Monospaced",Font.BOLD, 20));
 	
 		 try {
 			txtPatientAge = new JFormattedTextField(new MaskFormatter("##"));
@@ -281,31 +281,31 @@ public class HomePage
 			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
-		txtPatientAge.setBounds(350, 220, 450, 40);
+		txtPatientAge.setBounds(350, 150, 300, 40);
 		
 		lblFnm = new JLabel("Father's Name");
-		lblFnm.setFont(new Font("Monospaced",Font.BOLD, 24));
-		lblFnm.setBounds(40, 260, 300, 40);
+		lblFnm.setFont(new Font("Monospaced",Font.BOLD, 20));
+		lblFnm.setBounds(40, 200, 300, 40);
 		
 		txtFnm = new JTextField();
-		txtFnm.setBounds(350, 260, 450, 40);
+		txtFnm.setBounds(350, 200, 300, 40);
 		
 		lblGen = new JLabel("Gender");
-		lblGen.setFont(new Font("Monospaced",Font.BOLD, 24));
-		lblGen.setBounds(40, 320, 300, 40);
+		lblGen.setFont(new Font("Monospaced",Font.BOLD, 20));
+		lblGen.setBounds(40, 250, 300, 40);
 		
 		btnMale = new JRadioButton("Male");
-		btnMale.setBounds(300, 320, 100, 30);
+		btnMale.setBounds(350, 250, 100, 30);
 		
 		btnFem = new JRadioButton("Female");
-		btnFem.setBounds(450, 320, 100, 30);
+		btnFem.setBounds(450, 250, 100, 30);
 		
 		btngrp = new ButtonGroup();
 		btngrp.add(btnMale);
 		btngrp.add(btnFem);
 		
 		 btnChooseFile= new JButton("Choose File");
-		 btnChooseFile.setBounds(40,380,100,40);
+		 btnChooseFile.setBounds(40,300,100,40);
 		 btnChooseFile.setBackground(Color.CYAN);
 		 btnChooseFile.addActionListener(new ActionListener() {
 			
@@ -315,11 +315,14 @@ public class HomePage
 			}
 		});
 		
-		 lblUpload=new JLabel("No file Selected");
-		 lblUpload.setBounds(160, 380, 160, 40);
-		 lblUpload.setFont(new Font("Monospaced",Font.BOLD, 20));
+//		 lblUpload=new JLabel("No file Selected");
+//		 lblUpload.setBounds(160, 380, 160, 40);
+//		 lblUpload.setFont(new Font("Monospaced",Font.BOLD, 20));
+		 txtFileName= new JTextField();
+		 txtFileName.setText("No file Selected");
+		 txtFileName.setBounds(350,300,300,40);
+		 txtFileName.setEnabled(false);
 		 
-		
 		 btnSearch = new JButton("Search");
 		 btnSearch.setBounds(40,420,100,40);	
 		 btnSearch.setBackground(Color.CYAN);
@@ -368,7 +371,8 @@ public class HomePage
 			contentPanel.add(lblAge);
 			contentPanel.add(txtPatientAge);
 			contentPanel.add(btnChooseFile);
-			contentPanel.add(lblUpload);
+			//contentPanel.add(lblUpload);
+			contentPanel.add(txtFileName);
 		}
 		if("Search".equalsIgnoreCase(From)){
 		  contentPanel.add(btnSearch);
@@ -380,9 +384,9 @@ public class HomePage
 		int returnValue = jfc.showOpenDialog(null);
 		if(returnValue==JFileChooser.APPROVE_OPTION) {
 			selectedFile = jfc.getSelectedFile();
-			System.out.println("selectedFile"+selectedFile);
+			//System.out.println("selectedFile"+selectedFile);
 			
-			lblUpload.setText(selectedFile.getName());
+			txtFileName.setText(selectedFile.getName());
 		}
 	}
 	
