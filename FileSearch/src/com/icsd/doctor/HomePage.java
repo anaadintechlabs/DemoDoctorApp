@@ -24,6 +24,7 @@ import javax.print.DocFlavor;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -89,19 +90,23 @@ public class HomePage
 		 mainFrame.setSize(new Dimension(200,600));
 		 contentPanel = new JPanel();
 		
+    /*LOGO*/
+		 JLabel lblLogo = new JLabel(new ImageIcon("Images/logo.jpg"));
+		 lblLogo.setBounds(20, 0, 200, 200);
+		 menuPanel.add(lblLogo); 
 		menuButtons= new JButton[menuButtonStrings.length];
 		//Generating Menu Button
 		int i=0;
 		int xAxis;
-		int yAxis=0;
+		int yAxis=180;
 		for( i =0;i<menuButtons.length;i++) {
 			menuButtons[i]=new JButton(menuButtonStrings[i]);
 //			menuButtons[i].setPreferredSize(new Dimension(200, 70));
-			menuButtons[i].setForeground(Color.gray);
-			menuButtons[i].setBackground(Color.black);
+			menuButtons[i].setForeground(Color.white);
+			menuButtons[i].setBackground(Color.decode("#cb202d"));
 
-			menuButtons[i].setBounds(0, yAxis, 300, 50);
-			yAxis+=50;
+			menuButtons[i].setBounds(0, yAxis, 300, 70);
+			yAxis+=100;
 			menuButtons[i].addActionListener(new ActionListener() {
 				
 				@Override
@@ -119,6 +124,8 @@ public class HomePage
 			menuPanel.add(menuButtons[i]);
 		}
 		
+		menuPanel.setBackground(Color.white);
+		menuPanel.setBorder(BorderFactory.createEmptyBorder());
 		//Method for setting content
 		//setContentPanel("Home");
 		contentPanel.setBackground(Color.black);
@@ -137,6 +144,14 @@ public class HomePage
 		
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
+		
+		try {
+//			setDashboardContentInContentPanel();
+			setUploadContentInContentPanel("Upload");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 
 	}
@@ -216,7 +231,7 @@ public class HomePage
 		contentPanel.add(lblPoliceCase);
 		contentPanel.add(lblCTScan);
 		contentPanel.add(lblUltraSound);
-		
+		contentPanel.setBackground(Color.cyan);
 		
 	}
 

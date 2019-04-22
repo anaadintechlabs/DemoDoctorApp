@@ -39,7 +39,6 @@ import javax.swing.filechooser.FileSystemView;
  *
  */
 public class LoginFrame extends JFrame{
-
 	
 	private static final long serialVersionUID = 1L;
 
@@ -96,8 +95,8 @@ public class LoginFrame extends JFrame{
 		
 		 btnLogin = new JButton("Login");
 		btnLogin.setBounds(20,300,100,40);
-		btnLogin.setBackground(Color.CYAN);
-	
+		btnLogin.setBackground(Color.decode("#cb202d"));
+		btnLogin.setForeground(Color.white);
 		btnLogin.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
